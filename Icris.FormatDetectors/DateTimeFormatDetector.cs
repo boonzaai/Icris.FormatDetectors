@@ -141,7 +141,7 @@ namespace Icris.FormatDetectors
                 }
             }
             //ddMMyyHHmm
-            if(width== 10 && payloaddigits == 10)
+            if (width == 10 && payloaddigits == 10)
             {
                 //smallest format possible to contain time data also.
                 //Format must be ddMMyyHHmm or something like that
@@ -254,7 +254,7 @@ namespace Icris.FormatDetectors
                 //yyyyMMddHHmm
                 if (fourDigitYearFirst)
                 {
-                    if(CouldBeMonthPart(maxset.Select(x => x.Substring(4, 2)).ToArray()) &&
+                    if (CouldBeMonthPart(maxset.Select(x => x.Substring(4, 2)).ToArray()) &&
                         CouldBeDayPart(maxset.Select(x => x.Substring(6, 2)).ToArray()) &&
                         CouldBeHourPart(maxset.Select(x => x.Substring(8, 2)).ToArray()) &&
                         CouldBeSecondOrMinutePart(maxset.Select(x => x.Substring(10, 2)).ToArray()))
@@ -287,42 +287,170 @@ namespace Icris.FormatDetectors
                 //ddMMyyyy HHmm
                 if (char.IsDigit(datetimeseparator[0]))
                 {
-                    
+                    datetimeseparator = maxset.Select(x => x.Substring(8, 1)).Take(1).First();
+                    var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                    var secondgroup = maxset.Select(x => x.Substring(2, 2)).ToArray();
+                    var thirdgroup = maxset.Select(x => x.Substring(4, 4)).ToArray();
+                    var fourthgroup = maxset.Select(x => x.Substring(9, 2)).ToArray();
+                    var fifthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
+                    if (this.CouldBeDayPart(firstgroup) &&
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"ddMMyyyy{datetimeseparator}HHmm";
+                    }
+                    if (this.CouldBeDayPart(secondgroup) &&
+                        this.CouldBeMonthPart(firstgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"MMddyyyy{datetimeseparator}HHmm";
+                    }
+                    if (this.CouldBeYearPart(maxset.Select(x => x.Substring(0, 4)).ToArray()) &&
+                        this.CouldBeMonthPart(maxset.Select(x => x.Substring(4, 2)).ToArray()) &&
+                        this.CouldBeDayPart(maxset.Select(x => x.Substring(6, 2)).ToArray()) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"yyyyMMdd{datetimeseparator}HHmm";
+                    }
                 }
                 //ddMMyy HHmmss
-                var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
-                var secondgroup = maxset.Select(x => x.Substring(2, 2)).ToArray();
-                var thirdgroup = maxset.Select(x => x.Substring(4, 2)).ToArray();
-                var fourthgroup = maxset.Select(x => x.Substring(7, 2)).ToArray();
-                var fifthgroup = maxset.Select(x => x.Substring(9, 2)).ToArray();
-                var sixthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
-                
-                if (this.CouldBeDayPart(firstgroup) &&
-                        this.CouldBeMonthPart(secondgroup) &&
+                else
+                {
+                    var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                    var secondgroup = maxset.Select(x => x.Substring(2, 2)).ToArray();
+                    var thirdgroup = maxset.Select(x => x.Substring(4, 2)).ToArray();
+                    var fourthgroup = maxset.Select(x => x.Substring(7, 2)).ToArray();
+                    var fifthgroup = maxset.Select(x => x.Substring(9, 2)).ToArray();
+                    var sixthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
+
+                    if (this.CouldBeDayPart(firstgroup) &&
+                            this.CouldBeMonthPart(secondgroup) &&
+                            this.CouldBeYearPart(thirdgroup) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                            this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"ddMMyy{datetimeseparator}HHmmss";
+                    }
+                    if (this.CouldBeMonthPart(firstgroup) &&
+                        this.CouldBeDayPart(secondgroup) &&
                         this.CouldBeYearPart(thirdgroup) &&
                         this.CouldBeHourPart(fourthgroup) &&
                         this.CouldBeSecondOrMinutePart(fifthgroup) &&
                         this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"MMddyy{datetimeseparator}HHmmss";
+                    }
+                    if (this.CouldBeYearPart(firstgroup) &&
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeDayPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                        this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"yyMMdd{datetimeseparator}HHmmss";
+                    }
+                }
+            }
+            //dd-MM-yy HH:mm
+            if (width == 14 && payloaddigits == 10)
+            {
+                var dateseparator = maxset.Select(x => x.Substring(2, 1)).Take(1).First();
+                var timeseparator = maxset.Select(x => x.Substring(11, 1)).Take(1).First();
+                var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                var secondgroup = maxset.Select(x => x.Substring(3, 2)).ToArray();
+                var thirdgroup = maxset.Select(x => x.Substring(6, 2)).ToArray();
+                var fourthgroup = maxset.Select(x => x.Substring(9, 2)).ToArray();
+                var fifthgroup = maxset.Select(x => x.Substring(12, 2)).ToArray();
+                var datetimeseparator = maxset.Select(x => x.Substring(8, 1)).Take(1).First();
+
+                if (this.CouldBeDayPart(firstgroup) &&
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
                 {
-                    return $"ddMMyy{datetimeseparator}HHmmss";
+                    return $"dd{dateseparator}MM{dateseparator}yy{datetimeseparator}HH{timeseparator}mm";
                 }
                 if (this.CouldBeMonthPart(firstgroup) &&
-                    this.CouldBeDayPart(secondgroup) &&
-                    this.CouldBeYearPart(thirdgroup) &&
-                    this.CouldBeHourPart(fourthgroup) &&
-                    this.CouldBeSecondOrMinutePart(fifthgroup) &&
-                    this.CouldBeSecondOrMinutePart(sixthgroup))
+                        this.CouldBeDayPart(secondgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
                 {
-                    return $"MMddyy{datetimeseparator}HHmmss";
+                    return $"MM{dateseparator}dd{dateseparator}yy{datetimeseparator}HH{timeseparator}mm";
                 }
                 if (this.CouldBeYearPart(firstgroup) &&
-                    this.CouldBeMonthPart(secondgroup) &&
-                    this.CouldBeDayPart(thirdgroup) &&
-                    this.CouldBeHourPart(fourthgroup) &&
-                    this.CouldBeSecondOrMinutePart(fifthgroup) &&
-                    this.CouldBeSecondOrMinutePart(sixthgroup))
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeDayPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup))
                 {
-                    return $"yyMMdd{datetimeseparator}HHmmss";
+                    return $"yy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm";
+                }
+            }
+
+            //ddMMyyyyHHmmss
+            if(width==14 && payloaddigits == 14)
+            {
+
+            }
+            //ddMMyyyy HHmmss
+            if(width==15 && payloaddigits == 14)
+            {
+
+            }
+            //dd-MM-yyyy HH:mm
+            if(width==16 && payloaddigits == 12)
+            {
+                var dateseparator = maxset.Select(x => x.Substring(2, 1)).Take(1).First();
+                var fourthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
+                var fifthgroup = maxset.Select(x => x.Substring(14, 2)).ToArray();
+                var datetimeseparator = maxset.Select(x => x.Substring(10, 1)).Take(1).First();
+                var timeseparator = maxset.Select(x => x.Substring(13, 1)).Take(1).First();
+
+                if (!char.IsDigit(dateseparator[0]))
+                {                    
+                    var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                    var secondgroup = maxset.Select(x => x.Substring(3, 2)).ToArray();
+                    var thirdgroup = maxset.Select(x => x.Substring(6, 4)).ToArray();
+                    
+                    //dd-MM-yyyy HH:mm
+                    if (this.CouldBeDayPart(firstgroup) &&
+                            this.CouldBeMonthPart(secondgroup) &&
+                            this.CouldBeYearPart(thirdgroup) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"dd{dateseparator}MM{dateseparator}yyyy{datetimeseparator}HH{timeseparator}mm";
+                    }
+                    //MM-dd-yyyy HH:mm
+                    if (this.CouldBeMonthPart(firstgroup) &&
+                            this.CouldBeDayPart(secondgroup) &&
+                            this.CouldBeYearPart(thirdgroup) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"MM{dateseparator}dd{dateseparator}yyyy{datetimeseparator}HH{timeseparator}mm";
+                    }
+                }
+                else
+                {
+                    dateseparator = maxset.Select(x => x.Substring(4, 1)).Take(1).First();
+                    //yyyy-MM-dd HH:mm
+                    if (this.CouldBeYearPart(maxset.Select(x => x.Substring(0, 4)).ToArray()) &&
+                            this.CouldBeMonthPart(maxset.Select(x => x.Substring(5, 2)).ToArray()) &&
+                            this.CouldBeDayPart(maxset.Select(x => x.Substring(8, 2)).ToArray()) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup))
+                    {
+                        return $"yyyy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm";
+                    }                    
                 }
             }
             //dd-MM-yy HH:mm:ss
@@ -335,7 +463,7 @@ namespace Icris.FormatDetectors
             {
 
             }
-            throw new Exception($"Unable to determine format. Payloaddigits: {payloaddigits}, Width: {width}");
+            throw new Exception($"Unable to determine format. Payloaddigits: {payloaddigits}, Width: {width}, Example: {maxset.ToList().First().ToString()}");
         }
         private bool CouldBeSecondOrMinutePart(string[] values)
         {
