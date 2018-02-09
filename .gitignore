@@ -3,3 +3,7 @@
 ################################################################################
 
 /Icris.FormatDetectors/bin/Debug/netstandard2.0
+/Icris.FormatDetectors/obj
+/.vs/Icris.FormatDetectors/v15
+/Icris.FormatDetectors.Tests/bin/Debug
+/Icris.FormatDetectors.Tests/obj/Debug
