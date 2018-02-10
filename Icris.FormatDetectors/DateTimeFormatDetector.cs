@@ -19,12 +19,11 @@ namespace Icris.FormatDetectors
                 {
                     FormatString = DetermineFixedWidthFormat(maxset)
                 };
-
             }
             else
             {
                 //No fixed width. We need to find the separators then. Usual suspects: / . - : T + and space.
-                throw new Exception("To do");
+                throw new Exception("Your date/time values have no fixed width, unable to detect the format.");
             }
         }
 
@@ -525,7 +524,7 @@ namespace Icris.FormatDetectors
                         this.CouldBeMonthPart(secondgroup) &&
                         this.CouldBeYearPart(thirdgroup) &&
                         this.CouldBeHourPart(fourthgroup) &&
-                        this.CouldBeSecondOrMinutePart(fifthgroup)&&
+                        this.CouldBeSecondOrMinutePart(fifthgroup) &&
                         this.CouldBeSecondOrMinutePart(sixthgroup))
                 {
                     return $"dd{dateseparator}MM{dateseparator}yy{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
@@ -554,7 +553,55 @@ namespace Icris.FormatDetectors
             //dd-MM-yyyy HH:mm:ss
             if (width == 19 && payloaddigits == 14)
             {
+                var dateseparator = maxset.Select(x => x.Substring(2, 1)).Take(1).First();
+                var fourthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
+                var fifthgroup = maxset.Select(x => x.Substring(14, 2)).ToArray();
+                var sixthgroup = maxset.Select(x => x.Substring(17, 2)).ToArray();
 
+                var datetimeseparator = maxset.Select(x => x.Substring(10, 1)).Take(1).First();
+                var timeseparator = maxset.Select(x => x.Substring(13, 1)).Take(1).First();
+
+                if (!char.IsDigit(dateseparator[0]))
+                {
+                    var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                    var secondgroup = maxset.Select(x => x.Substring(3, 2)).ToArray();
+                    var thirdgroup = maxset.Select(x => x.Substring(6, 4)).ToArray();
+
+                    //dd-MM-yyyy HH:mm:ss
+                    if (this.CouldBeDayPart(firstgroup) &&
+                            this.CouldBeMonthPart(secondgroup) &&
+                            this.CouldBeYearPart(thirdgroup) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                            this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"dd{dateseparator}MM{dateseparator}yyyy{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                    }
+                    //MM-dd-yyyy HH:mm:ss
+                    if (this.CouldBeMonthPart(firstgroup) &&
+                            this.CouldBeDayPart(secondgroup) &&
+                            this.CouldBeYearPart(thirdgroup) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                            this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"MM{dateseparator}dd{dateseparator}yyyy{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                    }
+                }
+                else
+                {
+                    dateseparator = maxset.Select(x => x.Substring(4, 1)).Take(1).First();
+                    //yyyy-MM-dd HH:mm:ss
+                    if (this.CouldBeYearPart(maxset.Select(x => x.Substring(0, 4)).ToArray()) &&
+                            this.CouldBeMonthPart(maxset.Select(x => x.Substring(5, 2)).ToArray()) &&
+                            this.CouldBeDayPart(maxset.Select(x => x.Substring(8, 2)).ToArray()) &&
+                            this.CouldBeHourPart(fourthgroup) &&
+                            this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                            this.CouldBeSecondOrMinutePart(sixthgroup))
+                    {
+                        return $"yyyy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                    }
+                }
             }
             throw new Exception($"Unable to determine format. Payloaddigits: {payloaddigits}, Width: {width}, Example: {maxset.ToList().First().ToString()}");
         }
