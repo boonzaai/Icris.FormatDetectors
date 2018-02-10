@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Icris.FormatDetectors
@@ -12,13 +13,33 @@ namespace Icris.FormatDetectors
             var maxset = examples.Where(x => x.Select(c => char.IsDigit(c)).Count() >= 4).Select(y => y.Trim());
             //Step 2. Has the possible set a fixed width?
             var fixedwidth = maxset.Select(x => x.Length).Max() == maxset.Select(x => x.Length).Min();
+            
             string determinedformat = "";
             if (fixedwidth)
             {
-                return new DataDescription<DateTime>()
+                var description = new DataDescription<DateTime>();
+                var format = DetermineFixedWidthFormat(maxset);
+                description.FormatString = format;
+                if (maxset.Count() != examples.Count())
+                    description.EmptyValues = true;
+                var dates = examples.Select(x =>
                 {
-                    FormatString = DetermineFixedWidthFormat(maxset)
-                };
+                    DateTime value;
+                    if (!DateTime.TryParseExact(x, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out value))
+                    {
+                        description.EmptyValues = true;
+                        return null;
+                    }
+                    else
+                    {
+                        description.FoundAny = true;
+                        return new DateTime?(value);
+                    }
+                });
+                description.MaxValue = dates.Max().Value;
+                description.MinValue = dates.Min().Value;
+                description.Values = dates.ToArray();
+                return description;
             }
             else
             {

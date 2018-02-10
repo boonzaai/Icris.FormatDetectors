@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Icris.FormatDetectors
 {
-    interface IFormatDetector<T>
+    interface IFormatDetector<T> where T: struct
     {
         DataDescription<T> DetectFromValues(string[] examples);
     }

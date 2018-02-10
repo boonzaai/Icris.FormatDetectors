@@ -96,5 +96,21 @@ namespace Icris.FormatDetectors.Tests
                 Assert.AreEqual(x.Item1, new DateTimeFormatDetector().DetectFromValues(x.Item2).FormatString);
             });
         }
+        [TestMethod]
+        public void TestDescription()
+        {
+            string[] examples = new string[] {
+                "20180101 130000",
+                "20170820 170055",
+                "20201210 010101",
+                "20250101 000000",
+                ""
+            };
+            var result = new DateTimeFormatDetector().DetectFromValues(examples);
+            Assert.AreEqual(new DateTime(2025, 1, 1, 0, 0, 0), result.MaxValue);
+            Assert.AreEqual(new DateTime(2017, 8, 20, 17, 0, 55), result.MinValue);
+            Assert.AreEqual(true, result.EmptyValues);
+            Assert.AreEqual("yyyyMMdd HHmmss",result.FormatString);
+        }
     }
 }
