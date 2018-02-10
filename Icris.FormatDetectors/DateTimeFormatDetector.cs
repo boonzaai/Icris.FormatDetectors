@@ -394,19 +394,73 @@ namespace Icris.FormatDetectors
                     return $"yy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm";
                 }
             }
-
             //ddMMyyyyHHmmss
-            if(width==14 && payloaddigits == 14)
+            if (width == 14 && payloaddigits == 14)
             {
-
+                var timepartOk = CouldBeHourPart(maxset.Select(x => x.Substring(8, 2)).ToArray()) &&
+                    this.CouldBeSecondOrMinutePart(maxset.Select(x => x.Substring(10, 2)).ToArray()) &&
+                    this.CouldBeSecondOrMinutePart(maxset.Select(x => x.Substring(12, 2)).ToArray());
+                //yyyyMMddHHmmss
+                if (timepartOk &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(0, 4)).ToArray()) &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(4, 2)).ToArray()) &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(6, 2)).ToArray()))
+                {
+                    return "yyyyMMddHHmmss";
+                }
+                //ddMMyyyyHHmmss
+                if (timepartOk &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(0, 2)).ToArray()) &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(2, 2)).ToArray()) &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(4, 4)).ToArray()))
+                {
+                    return "ddMMyyyyHHmmss";
+                }
+                //MMddyyyyHHmmss
+                if (timepartOk &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(0, 2)).ToArray()) &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(2, 2)).ToArray()) &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(4, 4)).ToArray()))
+                {
+                    return "MMddyyyyHHmmss";
+                }
             }
             //ddMMyyyy HHmmss
-            if(width==15 && payloaddigits == 14)
+            if (width == 15 && payloaddigits == 14)
             {
+                var datetimeseparator = maxset.Select(x => x.Substring(8, 1)).First()[0];
 
+                var timepartOk = !char.IsDigit(datetimeseparator) &&
+                    CouldBeHourPart(maxset.Select(x => x.Substring(9, 2)).ToArray()) &&
+                    this.CouldBeSecondOrMinutePart(maxset.Select(x => x.Substring(11, 2)).ToArray()) &&
+                    this.CouldBeSecondOrMinutePart(maxset.Select(x => x.Substring(13, 2)).ToArray());
+                //yyyyMMddHHmmss
+                if (timepartOk &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(0, 4)).ToArray()) &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(4, 2)).ToArray()) &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(6, 2)).ToArray()))
+                {
+                    return $"yyyyMMdd{datetimeseparator}HHmmss";
+                }
+                //ddMMyyyyHHmmss
+                if (timepartOk &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(0, 2)).ToArray()) &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(2, 2)).ToArray()) &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(4, 4)).ToArray()))
+                {
+                    return $"ddMMyyyy{datetimeseparator}HHmmss";
+                }
+                //MMddyyyyHHmmss
+                if (timepartOk &&
+                    CouldBeMonthPart(maxset.Select(x => x.Substring(0, 2)).ToArray()) &&
+                    CouldBeDayPart(maxset.Select(x => x.Substring(2, 2)).ToArray()) &&
+                    CouldBeYearPart(maxset.Select(x => x.Substring(4, 4)).ToArray()))
+                {
+                    return $"MMddyyyy{datetimeseparator}HHmmss";
+                }
             }
             //dd-MM-yyyy HH:mm
-            if(width==16 && payloaddigits == 12)
+            if (width == 16 && payloaddigits == 12)
             {
                 var dateseparator = maxset.Select(x => x.Substring(2, 1)).Take(1).First();
                 var fourthgroup = maxset.Select(x => x.Substring(11, 2)).ToArray();
@@ -415,11 +469,11 @@ namespace Icris.FormatDetectors
                 var timeseparator = maxset.Select(x => x.Substring(13, 1)).Take(1).First();
 
                 if (!char.IsDigit(dateseparator[0]))
-                {                    
+                {
                     var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
                     var secondgroup = maxset.Select(x => x.Substring(3, 2)).ToArray();
                     var thirdgroup = maxset.Select(x => x.Substring(6, 4)).ToArray();
-                    
+
                     //dd-MM-yyyy HH:mm
                     if (this.CouldBeDayPart(firstgroup) &&
                             this.CouldBeMonthPart(secondgroup) &&
@@ -450,13 +504,52 @@ namespace Icris.FormatDetectors
                             this.CouldBeSecondOrMinutePart(fifthgroup))
                     {
                         return $"yyyy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm";
-                    }                    
+                    }
                 }
             }
             //dd-MM-yy HH:mm:ss
             if (width == 17 && payloaddigits == 12)
             {
+                var dateseparator = maxset.Select(x => x.Substring(2, 1)).Take(1).First();
+                var datetimeseparator = maxset.Select(x => x.Substring(8, 1)).Take(1).First();
+                var timeseparator = maxset.Select(x => x.Substring(11, 1)).Take(1).First();
+                var firstgroup = maxset.Select(x => x.Substring(0, 2)).ToArray();
+                var secondgroup = maxset.Select(x => x.Substring(3, 2)).ToArray();
+                var thirdgroup = maxset.Select(x => x.Substring(6, 2)).ToArray();
+                var fourthgroup = maxset.Select(x => x.Substring(9, 2)).ToArray();
+                var fifthgroup = maxset.Select(x => x.Substring(12, 2)).ToArray();
+                var sixthgroup = maxset.Select(x => x.Substring(15, 2)).ToArray();
 
+                //dd-MM-yy HH:mm:ss
+                if (this.CouldBeDayPart(firstgroup) &&
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup)&&
+                        this.CouldBeSecondOrMinutePart(sixthgroup))
+                {
+                    return $"dd{dateseparator}MM{dateseparator}yy{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                }
+                //MM-dd-yy HH:mm:ss
+                if (this.CouldBeMonthPart(firstgroup) &&
+                        this.CouldBeDayPart(secondgroup) &&
+                        this.CouldBeYearPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                        this.CouldBeSecondOrMinutePart(sixthgroup))
+                {
+                    return $"MM{dateseparator}dd{dateseparator}yy{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                }
+                //yy-MM-dd HH:mm:ss
+                if (this.CouldBeYearPart(firstgroup) &&
+                        this.CouldBeMonthPart(secondgroup) &&
+                        this.CouldBeDayPart(thirdgroup) &&
+                        this.CouldBeHourPart(fourthgroup) &&
+                        this.CouldBeSecondOrMinutePart(fifthgroup) &&
+                        this.CouldBeSecondOrMinutePart(sixthgroup))
+                {
+                    return $"yy{dateseparator}MM{dateseparator}dd{datetimeseparator}HH{timeseparator}mm{timeseparator}ss";
+                }
             }
             //dd-MM-yyyy HH:mm:ss
             if (width == 19 && payloaddigits == 14)
