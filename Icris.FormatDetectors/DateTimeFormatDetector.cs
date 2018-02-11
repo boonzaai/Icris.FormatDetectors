@@ -14,7 +14,6 @@ namespace Icris.FormatDetectors
             //Step 2. Has the possible set a fixed width?
             var fixedwidth = maxset.Select(x => x.Length).Max() == maxset.Select(x => x.Length).Min();
             
-            string determinedformat = "";
             if (fixedwidth)
             {
                 var description = new DataDescription<DateTime>();

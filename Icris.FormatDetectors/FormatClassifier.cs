@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Icris.FormatDetectors
@@ -16,17 +17,48 @@ namespace Icris.FormatDetectors
     public class FormatClassifier
     {
         /// <summary>
-        /// Determine the datatype of a set of values using statistical attributes.
+        /// Determine the probability a set of values belongs to a certain datatype.
+        /// Each value will be parsed to either an int, double, boolean, or date value.
+        /// The number of successful attempts for each type will be returned as a fraction of the total amount.
+        /// Keep in mind that multiple types can fit (e.g. double or int) so the probabilities can amount up to
+        /// a number greater than 1.0.
         /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
+        /// <param name="values">Values  that should be evaluated</param>
+        /// <returns>Classificationresult</returns>
         public FormatClassificationResult ClassifyFromValues(string[] values)
         {
+            var boolProbability = (double)values.Select(x =>
+            {
+                bool value;
+                return bool.TryParse(x, out value) ? 1 : 0;
+            }).Sum() / (double)values.Length;
 
+            var intProbability = (double)values.Select(x =>
+            {
+                int value;
+                return int.TryParse(x, out value) ? 1 : 0;
+            }).Sum() / (double)values.Length;
+
+            var doubleProbability = (double)values.Select(x =>
+            {
+                double value;
+                return double.TryParse(x, out value) ? 1 : 0;
+            }).Sum() / (double)values.Length;
+
+            var dateProbability = (double)values.Select(x =>
+            {
+                DateTime value;
+                return DateTime.TryParse(x, out value) ? 1 : 0;
+            }).Sum() / (double)values.Length;
+
+            
             return new FormatClassificationResult()
             {
                 Probabilities = new FormatClassificationProbability[] {
-                    new FormatClassificationProbability() { Type = typeof(string), Probability = 1 }
+                    new FormatClassificationProbability() { Type = typeof(bool), Probability = boolProbability },
+                    new FormatClassificationProbability() { Type = typeof(int), Probability = intProbability },
+                    new FormatClassificationProbability() { Type = typeof(double), Probability = doubleProbability },
+                    new FormatClassificationProbability() { Type = typeof(DateTime), Probability = dateProbability }
                 }
             };
 
