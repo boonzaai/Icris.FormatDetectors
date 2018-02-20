@@ -45,11 +45,18 @@ namespace Icris.FormatDetectors
                 return double.TryParse(x, out value) ? 1 : 0;
             }).Sum() / (double)values.Length;
 
-            var dateProbability = (double)values.Select(x =>
-            {
-                DateTime value;
-                return DateTime.TryParse(x, out value) ? 1 : 0;
-            }).Sum() / (double)values.Length;
+            var dateProbability = 0.0;
+
+            //Guess the datetimeformat.
+            var description = new DateTimeFormatDetector().DetectFromValues(values);
+            if (description.FoundAny)
+                dateProbability = (double)description.Values.Where(x => x != null).Count() / (double)values.Length;
+
+            //var dateProbability = (double)values.Select(x =>
+            //{
+            //    DateTime value;
+            //    return DateTime.TryParse(x, out value) ? 1 : 0;
+            //}).Sum() / (double)values.Length;
 
             
             return new FormatClassificationResult()

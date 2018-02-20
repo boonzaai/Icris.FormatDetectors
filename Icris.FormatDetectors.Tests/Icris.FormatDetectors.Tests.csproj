@@ -51,6 +51,7 @@
     <Compile Include="DateFormatDetectorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FormatClassifierTests.cs" />
+    <Compile Include="CSVDetectorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
