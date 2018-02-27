@@ -301,7 +301,7 @@ namespace Icris.FormatDetectors.Tests
             File.WriteAllText(tmpfile, this.testset);
             var evaluator = new CSVDetector(tmpfile);
 
-            var cols = evaluator.GetColumnData();
+            var cols = evaluator.GetColumnSpecs();
         }
     }
 }

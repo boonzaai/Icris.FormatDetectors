@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Icris.FormatDetectors
 {
-    public class DateTimeFormatDetector : IFormatDetector<DateTime>
+    public class DateTimeFormatDetector : IFormatDetector
     {
-        public DataDescription<DateTime> DetectFromValues(string[] examples)
+        public DataDescription DetectFromValues(string[] examples)
         {
             //Step 1. Minimum viable data payload should be at least 4 digits. 1-1-11 or 1/1/11
             var maxset = examples.Where(x => x.Select(c => char.IsDigit(c)).Count() >= 4).Select(y => y.Trim());
@@ -16,7 +16,7 @@ namespace Icris.FormatDetectors
             
             if (fixedwidth)
             {
-                var description = new DataDescription<DateTime>();
+                var description = new DataDescription();
                 var format = DetermineFixedWidthFormat(maxset);
                 description.FormatString = format;
                 if (maxset.Count() != examples.Count())
@@ -37,7 +37,7 @@ namespace Icris.FormatDetectors
                 });
                 description.MaxValue = dates.Max().Value;
                 description.MinValue = dates.Min().Value;
-                description.Values = dates.ToArray();
+                description.Values = dates.Select(x=>(object)x).ToArray();
                 return description;
             }
             else

@@ -4,13 +4,14 @@ using System.Text;
 
 namespace Icris.FormatDetectors
 {
-    public class DataDescription<T> where T:struct
+    public class DataDescription
     {
-        public T MinValue { get; set; }
-        public T MaxValue { get; set; }
+        public Type Type { get; set; }
+        public object MinValue { get; set; }
+        public object MaxValue { get; set; }
         public bool EmptyValues { get; set; }
         public bool FoundAny { get; set; }
         public string FormatString { get; set; }
-        public Nullable<T>[] Values { get; set; }
+        public object[] Values { get; set; }
     }
 }

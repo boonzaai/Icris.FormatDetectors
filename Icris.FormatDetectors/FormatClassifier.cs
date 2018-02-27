@@ -47,11 +47,17 @@ namespace Icris.FormatDetectors
 
             var dateProbability = 0.0;
 
-            //Guess the datetimeformat.
-            var description = new DateTimeFormatDetector().DetectFromValues(values);
-            if (description.FoundAny)
-                dateProbability = (double)description.Values.Where(x => x != null).Count() / (double)values.Length;
-
+            try
+            {
+                //Guess the datetimeformat.
+                var description = new DateTimeFormatDetector().DetectFromValues(values);
+                if (description.FoundAny)
+                    dateProbability = (double)description.Values.Where(x => x != null).Count() / (double)values.Length;
+            }
+            catch (Exception e)
+            {
+                //No date format found.
+            }
             //var dateProbability = (double)values.Select(x =>
             //{
             //    DateTime value;

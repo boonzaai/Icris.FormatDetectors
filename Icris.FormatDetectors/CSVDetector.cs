@@ -72,7 +72,10 @@ namespace Icris.FormatDetectors
             Messages.Add(message);
         }
 
-
+        /// <summary>
+        /// Retrieve a dictionairy with all columns
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string,List<string>> GetColumnData()
         {
             var value = new Dictionary<string, List<string>>();
@@ -103,7 +106,17 @@ namespace Icris.FormatDetectors
 
         public Dictionary<string,DataDescription> GetColumnSpecs()
         {
-
+            var specs = new Dictionary<string, DataDescription>();
+            var columns = GetColumnData();
+            foreach(var col in columns)
+            {
+                var result = new FormatClassifier().ClassifyFromValues(col.Value.ToArray());
+                var type = result.Probabilities.OrderBy(x => x.Probability).Last();
+                DataDescription description = new DataDescription();
+                description.Type = type.Type;
+                specs.Add(col.Key, description);
+            }
+            return specs;
         }
 
     }
