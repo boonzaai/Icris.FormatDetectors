@@ -12,6 +12,7 @@ namespace Icris.FormatDetectors
     }
     public class FormatClassificationResult
     {
+        public DataDescription MostProbableFormat { get; set; }
         public FormatClassificationProbability[] Probabilities;
     }
     public class FormatClassifier
