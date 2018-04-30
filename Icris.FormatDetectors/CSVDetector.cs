@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,7 +32,7 @@ namespace Icris.FormatDetectors
             char guessedSeparator = ' ';
             char guessedDelimiter = '\0';
             int occurrences = 0;
-            //Make a gues which separator is used.
+            //Make a guess which separator is used.
             foreach (var sep in separators)
             {
                 var sepcount = evaluationset.Select(x => x.Split(sep).Length - 1).Max();
@@ -51,8 +53,8 @@ namespace Icris.FormatDetectors
                 var linesWithEvenDelimiters = evaluationset.Where(x =>
                 {
                     var noOfDelimiters = x.Where(c => c == delimiter).Count();
-                    if (noOfDelimiters > 0)
-                        System.Diagnostics.Debugger.Break();
+                    //if (noOfDelimiters > 0)
+                    //    System.Diagnostics.Debugger.Break();
                     return noOfDelimiters > 0 && noOfDelimiters % 2 == 0;
                 }).ToList();
                 //Find lines with pairs of delimiters.
@@ -76,15 +78,15 @@ namespace Icris.FormatDetectors
         /// Retrieve a dictionairy with all columns
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string,List<string>> GetColumnData()
+        public Dictionary<string, List<string>> GetColumnData()
         {
             var value = new Dictionary<string, List<string>>();
-            foreach(var header in Headers)
+            foreach (var header in Headers)
             {
                 value.Add(header, new List<string>());
             }
             long recordcounter = 0;
-            foreach(var record in Lines)
+            foreach (var record in Lines)
             {
                 var values = record.Split(this.Separator);
                 if (values.Count() != Headers.Count)
@@ -104,11 +106,11 @@ namespace Icris.FormatDetectors
             return value;
         }
 
-        public Dictionary<string,DataDescription> GetColumnSpecs()
+        public Dictionary<string, DataDescription> GetColumnSpecs()
         {
             var specs = new Dictionary<string, DataDescription>();
             var columns = GetColumnData();
-            foreach(var col in columns)
+            foreach (var col in columns)
             {
                 var result = new FormatClassifier().ClassifyFromValues(col.Value.ToArray());
                 var type = result.Probabilities.OrderBy(x => x.Probability).Last();
@@ -117,6 +119,31 @@ namespace Icris.FormatDetectors
                 specs.Add(col.Key, description);
             }
             return specs;
+        }
+
+        public IEnumerable<JObject> Rows
+        {
+            get
+            {
+                return Lines.Skip(this.FirstDataRecord).Select(x =>
+                {
+                    Dictionary<string, object> record = new Dictionary<string, object>();
+                    var fields = x.Split(this.Separator);
+                    foreach (var header in this.Headers)
+                    {
+                        double doublevalue;
+                        int intvalue;
+                        string stringvalue = fields[this.Headers.IndexOf(header)];
+                        if (int.TryParse(stringvalue, NumberStyles.Integer, CultureInfo.InvariantCulture, out intvalue))
+                            record.Add(header, intvalue);
+                        else if (double.TryParse(stringvalue, NumberStyles.Number, CultureInfo.InvariantCulture, out doublevalue))
+                            record.Add(header, doublevalue);
+                        else
+                            record.Add(header, stringvalue);
+                    }
+                    return JObject.FromObject(record);
+                });
+            }
         }
 
     }

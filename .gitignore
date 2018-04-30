@@ -9,3 +9,5 @@
 /Icris.FormatDetectors.Tests/obj/Debug
 /packages
 /.axoCover/runs
+/Icris.LogFile2MQTT/bin/Debug
+/Icris.LogFile2MQTT/obj/Debug

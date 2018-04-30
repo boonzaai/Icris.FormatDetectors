@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Icris.FormatDetectors.Tests
@@ -302,6 +303,7 @@ namespace Icris.FormatDetectors.Tests
             var evaluator = new CSVDetector(tmpfile);
 
             var cols = evaluator.GetColumnSpecs();
+            var coltypes = cols.Select(x => x.Value.Type).ToList();
         }
     }
 }

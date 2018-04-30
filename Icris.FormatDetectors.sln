@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Icris.FormatDetectors", "Ic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icris.FormatDetectors.Tests", "Icris.FormatDetectors.Tests\Icris.FormatDetectors.Tests.csproj", "{A91F76C0-ABF3-499B-973B-0ACAEB116F4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Icris.LogFile2MQTT", "Icris.LogFile2MQTT\Icris.LogFile2MQTT.csproj", "{7F7526C5-48D9-453B-880E-145FA5113CAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A91F76C0-ABF3-499B-973B-0ACAEB116F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A91F76C0-ABF3-499B-973B-0ACAEB116F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A91F76C0-ABF3-499B-973B-0ACAEB116F4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F7526C5-48D9-453B-880E-145FA5113CAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F7526C5-48D9-453B-880E-145FA5113CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F7526C5-48D9-453B-880E-145FA5113CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F7526C5-48D9-453B-880E-145FA5113CAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
